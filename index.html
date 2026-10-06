@@ -19,7 +19,7 @@ body{margin:0;background:#000;background-image:linear-gradient(#0c0c0c 1px,trans
 #side button.on{background:var(--purple);color:#fff;border-color:#8b82ff #2a2380 #2a2380 #8b82ff}
 #side button:hover{color:#fff}
 #side .out{margin-top:auto}
-main{margin-left:84px;padding:16px;max-width:900px}
+main{margin-left:84px;padding:16px}
 .bar{background:linear-gradient(#3a82e8,#1d4fa3);border:2px solid;border-color:#7fb0ff #0d2b60 #0d2b60 #7fb0ff;padding:8px 12px;font-weight:bold;font-size:18px;text-shadow:1px 1px #000;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
 .box{background:var(--panel);border:2px solid;border-color:#555 #0a0a0a #0a0a0a #555;padding:12px;margin:10px 0}
 .quote{color:var(--yellow);font-style:italic}
@@ -153,6 +153,8 @@ if(t.type=="checkbox"||(d.s=="d"&&d.k=="d")){if(d.s=="d")sortD();save();render()
 save();tot()});
 document.addEventListener("keydown",function(e){if(e.key=="Enter"&&e.target.closest&&e.target.closest("#auth")){var b=document.querySelector("#auth [data-a=log],#auth [data-a=reg]");if(b)b.click()}});
 
+function fit(){document.documentElement.style.zoom=Math.min(2.5,Math.max(1,innerWidth/1100))}
+addEventListener("resize",fit);fit();
 var ses;try{ses=sessionStorage.getItem("sess");var rem=false;if(!ses){ses=localStorage.getItem("sess");rem=!!ses}}catch(e){}
 if(ses&&(ses=="owner"||acc()[ses]))start(ses,rem);else gate();
 </script>
