@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Моё расписание</title>
+<style>
+:root{--bg:#000;--panel:#161616;--panel2:#202020;--line:#4a4a4a;--text:#f2f2f2;--dim:#9a9a9a;--green:#2fa82f;--green2:#1c7a1c;--blue:#2a6fd6;--purple:#5b4fe0;--yellow:#f1c40f;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:#000;background-image:linear-gradient(#0c0c0c 1px,transparent 1px),linear-gradient(90deg,#0c0c0c 1px,transparent 1px);background-size:32px 32px;color:var(--text);font:14px Verdana,Arial,sans-serif;min-height:100vh}
+.hide{display:none!important}
+#auth{max-width:380px;margin:10vh auto;padding:12px}
+#auth input[type=text],#auth input[type=password]{width:100%}
+#side{position:fixed;left:0;top:0;bottom:0;width:84px;background:#0b0b0b;border-right:2px solid var(--line);display:flex;flex-direction:column;gap:6px;padding:12px 6px;z-index:5}
+#side button{background:var(--panel);border:2px solid;border-color:#555 #111 #111 #555;color:var(--dim);padding:8px 2px;cursor:pointer;font:10px Verdana;display:flex;flex-direction:column;align-items:center;gap:4px}
+#side button span{font-size:22px}
+#side button.on{background:var(--purple);color:#fff;border-color:#8b82ff #2a2380 #2a2380 #8b82ff}
+#side button:hover{color:#fff}
+#side .out{margin-top:auto}
+main{margin-left:84px;padding:16px;max-width:900px}
+.bar{background:linear-gradient(#3a82e8,#1d4fa3);border:2px solid;border-color:#7fb0ff #0d2b60 #0d2b60 #7fb0ff;padding:8px 12px;font-weight:bold;font-size:18px;text-shadow:1px 1px #000;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.box{background:var(--panel);border:2px solid;border-color:#555 #0a0a0a #0a0a0a #555;padding:12px;margin:10px 0}
+.quote{color:var(--yellow);font-style:italic}
+.xp{height:16px;background:#000;border:2px solid #444;margin-top:8px}
+.xp i{display:block;height:100%;background:linear-gradient(#5be05b,var(--green2));width:0;transition:width .4s}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.btn{background:linear-gradient(#4cc94c,var(--green2));border:2px solid;border-color:#8cf08c #0f4a0f #0f4a0f #8cf08c;color:#fff;font:bold 13px Verdana;padding:6px 12px;cursor:pointer;text-shadow:1px 1px #000}
+.btn.red{background:linear-gradient(#e0574a,#8e2217);border-color:#ff9a90 #4d0f08 #4d0f08 #ff9a90}
+.btn.gray{background:linear-gradient(#777,#3b3b3b);border-color:#aaa #222 #222 #aaa}
+.btn:active{filter:brightness(.8)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin:10px 0}
+.tabs button{background:var(--panel2);color:var(--dim);border:2px solid;border-color:#555 #111 #111 #555;padding:7px 12px;cursor:pointer;font:bold 13px Verdana}
+.tabs button.on{background:var(--blue);color:#fff}
+.card{background:var(--panel2);border:2px solid;border-color:#5a5a5a #0d0d0d #0d0d0d #5a5a5a;padding:9px 12px;margin:8px 0;display:flex;gap:10px;align-items:center}
+.card.study{border-left:5px solid var(--green)}
+.card.done{opacity:.5}.card.done input[type=text]{text-decoration:line-through}
+.fields{display:flex;gap:6px;flex-wrap:wrap;flex:1;align-items:center}
+input[type=checkbox]{width:22px;height:22px;accent-color:var(--green);cursor:pointer;flex:none}
+input[type=text],input[type=password],input[type=number],input[type=date],textarea{background:#000;color:var(--text);border:2px solid #555;padding:5px 7px;font:13px Verdana;max-width:100%;color-scheme:dark}
+input[type=text]{flex:1;min-width:110px}
+input[type=number]{width:64px}
+.nm{font-weight:bold;flex:0 0 150px!important}
+textarea{width:100%;min-height:110px;resize:vertical}
+.badge{padding:3px 8px;border:2px solid #555;background:#000;font-weight:bold;white-space:nowrap}
+.badge.warn{color:var(--yellow);border-color:var(--yellow)}.badge.bad{color:#ff6b5e;border-color:#ff6b5e}.badge.ok{color:#6be06b;border-color:#6be06b}
+h2{margin:6px 0}
+.empty{color:var(--dim);text-align:center;padding:18px}
+@media(max-width:640px){
+#side{top:auto;width:100%;flex-direction:row;border-right:0;border-top:2px solid var(--line);padding:6px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))}
+#side button{flex:1;padding:4px 0}#side button span{font-size:18px}#side .out{margin-top:0}
+main{margin-left:0;padding:10px 10px 90px}
+.nm{flex:1 1 100%!important}
+}
+</style>
+</head>
+<body>
+<div id="auth" class="hide"></div>
+<nav id="side" class="hide"></nav>
+<main id="main" class="hide"></main>
+<script>
+var OWN={s:"8ab3f0f7ae05b8f2532b251d4cb263fe",h:"1465733fc50bf07343c0102b26282f6492a630a6cbe6915bae82b1c49c7c6439"},AK="sched_accounts_v1",NAV=[["s","📅","Расписание"],["n","📝","Заметки"],["g","🎯","Цели"],["d","⏰","Дедлайны"]],
+DN=["","Пн","Вт","Ср","Чт","Пт","Сб","Вс"],DF=["","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"],
+QUOTES=["Каждый пункт — это +XP!","Закрой квесты дня — получи награду.","Маленький шаг каждый день = новый уровень.","Дисциплина сильнее мотивации.","Ты можешь больше, чем думаешь. Вперёд!","Не откладывай на завтра — квест дня уже доступен.","Сегодня ты на шаг ближе к цели."];
+var enc=new TextEncoder(),user=null,S=null,page="s",pend="",fails=0,lockUntil=0;
+function hx(b){return Array.from(new Uint8Array(b)).map(function(x){return("0"+x.toString(16)).slice(-2)}).join("")}
+function hash(pw,salt){return crypto.subtle.importKey("raw",enc.encode(pw),"PBKDF2",false,["deriveBits"]).then(function(k){return crypto.subtle.deriveBits({name:"PBKDF2",salt:enc.encode(salt),iterations:120000,hash:"SHA-256"},k,256)}).then(hx)}
+function eq(a,b){if(a.length!=b.length)return false;var r=0;for(var i=0;i<a.length;i++)r|=a.charCodeAt(i)^b.charCodeAt(i);return r==0}
+function acc(){try{return JSON.parse(localStorage.getItem(AK))||{}}catch(e){return{}}}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function $(i){return document.getElementById(i)}
+function msg(t){$("msg").textContent=t}
+function isoWeek(d){d=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));var n=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-n);var y=new Date(Date.UTC(d.getUTCFullYear(),0,1));return Math.ceil(((d-y)/864e5+1)/7)}
+var AUTO=isoWeek(new Date())%2?1:2,wk=AUTO,day=(function(){var d=new Date().getDay();return d==0?7:d})();
+
+/* ---------- план по умолчанию (только для owner) ---------- */
+function planDef(){var Z=function(s){return s.split("|")},
+P=[["Blender",[Z("Интерфейс и навигация|Move / Rotate / Scale|Edit Mode: extrude|Bevel и Loop Cut|Модификаторы: Mirror, Subdivision|Собрать простой предмет|Повтор горячих клавиш"),Z("Материалы|Свет и камера|Первый рендер (Eevee)|Keyframes и Timeline|UV и текстуры (база)|Мини-сцена|Рендер своей сцены")]],
+["DaVinci Resolve",[Z("Импорт и Media Pool|Cut page: нарезка|Таймлайн и Trim|Переходы|Звук и громкость|Титры|Экспорт ролика"),Z("Color: баланс белого|Color: контраст|LUT и стили|Скорость и замедление|Стабилизация и Crop|Мини-ролик 15 сек|Экспорт для YouTube")]],
+["After Effects",[Z("Интерфейс и композиция|Слои|Keyframes: Position/Scale/Rotation|Shape layers|Анимация текста|Pre-comp|Экспорт"),Z("Graph Editor|Easing (плавность)|Маски|Эффекты и Glow|Parent и Null|Мини-интро 5 сек|Рендер интро")]],
+["Анимация",[Z("Squash & Stretch|Timing|Ease in / out|Anticipation|Arcs (дуги)|Follow through|Разбор референса"),Z("Staging|Overlap|Secondary action|Мячик: прыжок|Мячик с хвостом|Мини-анимация 3 сек|Покажи кому-нибудь")]]],
+M=[[10,8,10,7,5],[8,6,8,5,3],[5,4,5,3,3]],p={1:{},2:{}};
+for(var w=0;w<2;w++)for(var d=0;d<7;d++){var m=M[d<5?0:d==5?1:2],a=[];
+P.forEach(function(x,i){a.push({n:x[0],t:x[1][w][d],m:m[i],x:false})});
+a.push({n:"Итог дня",t:"Запиши, что узнал, и 1 горячую клавишу",m:m[4],x:false});p[w+1][d+1]=a}
+return p}
+function emptyPlan(){var p={1:{},2:{}};for(var w=1;w<=2;w++)for(var d=1;d<=7;d++)p[w][d]=[];return p}
+function fresh(u){var s={plan:u=="owner"?planDef():emptyPlan(),notes:[],goals:[],dl:[]};
+if(u=="owner")try{var o=JSON.parse(localStorage.getItem("giber_schedule_v1"));if(o){s.notes=o.notes||[];s.goals=o.goals||[];s.dl=o.dl||[]}}catch(e){}return s}
+function save(){try{localStorage.setItem("sd_"+user,JSON.stringify(S))}catch(e){}}
+
+/* ---------- аккаунты ---------- */
+function authUI(m){var r=m=="r";$("auth").innerHTML='<div class="bar">★ '+(r?"РЕГИСТРАЦИЯ":"ВХОД")+'</div><div class="box"><input type="text" id="u" placeholder="Логин" autocomplete="username" maxlength="20"><br><br><input type="password" id="p" placeholder="Пароль" autocomplete="'+(r?"new-password":"current-password")+'">'+(r?'<br><br><input type="password" id="p2" placeholder="Повтори пароль" autocomplete="new-password">':'')+'<br><br><label><input type="checkbox" id="rm"> Запомнить меня</label><div id="msg" style="color:#ff6b5e;min-height:22px;margin:8px 0"></div><button class="btn" data-a="'+(r?"reg":"log")+'">'+(r?"Создать аккаунт":"Войти")+'</button> <button class="btn gray" data-a="amode" data-v="'+(r?"l":"r")+'">'+(r?"← Вход":"Регистрация")+'</button></div>'}
+function login(){if(!window.crypto||!crypto.subtle)return msg("Открой сайт по https (GitHub Pages) — иначе пароль не проверить.");
+var u=$("u").value.trim().toLowerCase(),p=$("p").value,rm=$("rm").checked;
+if(Date.now()<lockUntil)return msg("Слишком много попыток. Подожди "+Math.ceil((lockUntil-Date.now())/1000)+" сек.");
+var rec=u=="owner"?OWN:acc()[u];
+hash(p,rec?rec.s:"x").then(function(h){if(rec&&eq(h,rec.h)){fails=0;start(u,rm)}else{if(++fails>=5){lockUntil=Date.now()+30000;fails=0}msg("Неверный логин или пароль")}})}
+function reg(){if(!window.crypto||!crypto.subtle)return msg("Открой сайт по https (GitHub Pages).");
+var u=$("u").value.trim().toLowerCase(),p=$("p").value,rm=$("rm").checked;
+if(!/^[a-z0-9_]{3,20}$/.test(u))return msg("Логин: 3–20 символов, латиница, цифры, _");
+if(p.length<6)return msg("Пароль минимум 6 символов");
+if(p!==$("p2").value)return msg("Пароли не совпадают");
+var a=acc();if(u=="owner"||a[u])return msg("Это имя занято");
+var salt=hx(crypto.getRandomValues(new Uint8Array(16)));
+hash(p,salt).then(function(h){a[u]={s:salt,h:h};try{localStorage.setItem(AK,JSON.stringify(a))}catch(e){return msg("Не удалось сохранить аккаунт")}start(u,rm)})}
+function start(u,rm){user=u;try{localStorage.removeItem("sess");sessionStorage.removeItem("sess");(rm?localStorage:sessionStorage).setItem("sess",u)}catch(e){}
+try{S=JSON.parse(localStorage.getItem("sd_"+u))}catch(e){S=null}
+if(!S||!S.plan)S=fresh(u);save();page="s";gate()}
+function out(){user=null;S=null;try{localStorage.removeItem("sess");sessionStorage.removeItem("sess")}catch(e){}gate()}
+function gate(){var on=!!user;$("auth").classList.toggle("hide",on);$("side").classList.toggle("hide",!on);$("main").classList.toggle("hide",!on);if(on)render();else authUI("l")}
+
+/* ---------- интерфейс ---------- */
+function xp(){var t=0;[1,2].forEach(function(w){for(var k in S.plan[w])S.plan[w][k].forEach(function(l){if(l.x)t+=5})});S.goals.forEach(function(g){if(g.x)t+=20});S.dl.forEach(function(g){if(g.x)t+=15});return t}
+function header(){var p=xp(),lv=Math.floor(p/100)+1,t=S.plan[wk][day],dn=t.filter(function(l){return l.x}).length,q=QUOTES[new Date().getDate()%QUOTES.length];
+return '<div class="bar"><span>★ МОЁ РАСПИСАНИЕ</span><span>👤 '+esc(user)+' · Уровень '+lv+' · '+p+' XP</span></div><div class="box"><div class="quote">“'+q+'”</div><div class="xp"><i style="width:'+(p%100)+'%"></i></div><small style="color:var(--dim)">До следующего уровня: '+(100-p%100)+' XP · Пунктов сегодня выполнено: '+dn+'/'+t.length+'</small></div>'}
+function sched(){var u=S.plan[wk][day],h='<div class="tabs">';
+for(var d=1;d<=7;d++)h+='<button data-a="tab" data-v="'+d+'" class="'+(d==day?"on":"")+'">'+DN[d]+'</button>';
+h+='</div><div class="row"><h2>'+DF[day]+' <span class="badge" id="tot"></span></h2><span><button class="btn'+(wk==1?"":" gray")+'" data-a="wk" data-v="1">Неделя 1</button> <button class="btn'+(wk==2?"":" gray")+'" data-a="wk" data-v="2">Неделя 2</button></span></div><small style="color:var(--dim)">По календарю сейчас неделя '+AUTO+' · Все поля можно менять прямо тут</small>';
+if(!u.length)h+='<div class="box empty">Пока пусто. Нажми «+ Пункт».</div>';
+u.forEach(function(l,i){var a=' data-s="p" data-i="'+i+'" data-k=';h+='<div class="card study '+(l.x?"done":"")+'"><input type="checkbox"'+a+'"x" '+(l.x?"checked":"")+'><div class="fields"><input type="text" class="nm"'+a+'"n" value="'+esc(l.n)+'" placeholder="Программа"><input type="text"'+a+'"t" value="'+esc(l.t)+'" placeholder="Что делать"><input type="number" min="0" max="600"'+a+'"m" value="'+l.m+'"> мин</div><button class="btn red" data-a="del" data-s="p" data-i="'+i+'">✕</button></div>'});
+return h+'<div style="margin-top:10px"><button class="btn" data-a="add">+ Пункт</button> <button class="btn gray" data-a="reset">↺ Сбросить день</button></div>'}
+function tot(){var e=$("tot");if(e)e.textContent="Всего: "+S.plan[wk][day].reduce(function(a,l){return a+(+l.m||0)},0)+" мин"}
+function notes(){var h='<div class="row"><h2>Заметки</h2><button class="btn" data-a="add">+ Заметка</button></div>';
+if(!S.notes.length)h+='<div class="box empty">Пока пусто.</div>';
+S.notes.forEach(function(n,i){h+='<div class="box"><div class="row" style="margin-bottom:6px;flex-wrap:nowrap"><input type="text" data-s="n" data-i="'+i+'" data-k="t" value="'+esc(n.t)+'" placeholder="Заголовок"><button class="btn red" data-a="del" data-s="n" data-i="'+i+'">✕</button></div><textarea data-s="n" data-i="'+i+'" data-k="c" placeholder="Текст заметки...">'+esc(n.c)+'</textarea></div>'});return h}
+function goals(){var done=S.goals.filter(function(g){return g.x}).length,pc=S.goals.length?Math.round(done/S.goals.length*100):0;
+var h='<div class="row"><h2>Цели</h2><button class="btn" data-a="add">+ Цель</button></div><div class="box"><small style="color:var(--dim)">Выполнено '+done+' из '+S.goals.length+' (+20 XP за каждую)</small><div class="xp"><i style="width:'+pc+'%"></i></div></div>';
+if(!S.goals.length)h+='<div class="box empty">Поставь первую цель!</div>';
+S.goals.forEach(function(g,i){h+='<div class="card '+(g.x?"done":"")+'"><input type="checkbox" data-s="g" data-i="'+i+'" data-k="x" '+(g.x?"checked":"")+'><input type="text" data-s="g" data-i="'+i+'" data-k="t" value="'+esc(g.t)+'" placeholder="Моя цель"><button class="btn red" data-a="del" data-s="g" data-i="'+i+'">✕</button></div>'});return h}
+function dls(){var h='<div class="row"><h2>Дедлайны</h2><button class="btn" data-a="add">+ Дедлайн</button></div>';
+if(!S.dl.length)h+='<div class="box empty">Дедлайнов нет.</div>';
+var t0=new Date();t0.setHours(0,0,0,0);
+S.dl.forEach(function(g,i){var b="";if(g.d){var n=Math.round((new Date(g.d+"T00:00:00")-t0)/864e5);b=g.x?'<span class="badge ok">готово</span>':n<0?'<span class="badge bad">просрочено '+(-n)+' дн.</span>':n==0?'<span class="badge bad">сегодня!</span>':'<span class="badge '+(n<=2?"warn":"ok")+'">'+n+' дн.</span>'}
+h+='<div class="card '+(g.x?"done":"")+'"><input type="checkbox" data-s="d" data-i="'+i+'" data-k="x" '+(g.x?"checked":"")+'><div class="fields"><input type="text" data-s="d" data-i="'+i+'" data-k="t" value="'+esc(g.t)+'" placeholder="Что сдать?"><input type="date" data-s="d" data-i="'+i+'" data-k="d" value="'+esc(g.d)+'"></div>'+b+'<button class="btn red" data-a="del" data-s="d" data-i="'+i+'">✕</button></div>'});return h}
+function render(){$("side").innerHTML=NAV.map(function(n){return '<button data-a="nav" data-v="'+n[0]+'" class="'+(n[0]==page?"on":"")+'"><span>'+n[1]+'</span>'+n[2]+'</button>'}).join("")+'<button class="out" data-a="out"><span>🚪</span>Выйти</button>';
+$("main").innerHTML=header()+({s:sched,n:notes,g:goals,d:dls})[page]();tot()}
+function arr(s){return s=="p"?S.plan[wk][day]:s=="n"?S.notes:s=="g"?S.goals:S.dl}
+function sortD(){S.dl.sort(function(a,b){return(a.d||"9")<(b.d||"9")?-1:1})}
+document.addEventListener("click",function(e){var t=e.target.closest("[data-a]");if(!t)return;var a=t.dataset.a;
+if(a=="log")return login();if(a=="reg")return reg();if(a=="amode")return authUI(t.dataset.v);if(a=="out")return out();
+if(a=="nav")page=t.dataset.v;
+else if(a=="tab")day=+t.dataset.v;
+else if(a=="wk")wk=+t.dataset.v;
+else if(a=="reset")S.plan[wk][day].forEach(function(l){l.x=false});
+else if(a=="add"){if(page=="s")S.plan[wk][day].push({n:"Новый пункт",t:"",m:10,x:false});else if(page=="n")S.notes.unshift({t:"",c:""});else if(page=="g")S.goals.push({t:"",x:false});else{S.dl.push({t:"",d:"",x:false});sortD()}}
+else if(a=="del"){var k=t.dataset.s+t.dataset.i;if(pend!=k){pend=k;t.textContent="Точно?";setTimeout(function(){if(pend==k){pend="";t.textContent="✕"}},2500);return}pend="";arr(t.dataset.s).splice(+t.dataset.i,1)}
+save();render()});
+document.addEventListener("input",function(e){var t=e.target,d=t.dataset;if(!d.s||!S)return;var o=arr(d.s)[+d.i];if(!o)return;
+o[d.k]=t.type=="checkbox"?t.checked:d.k=="m"?Math.max(0,+t.value||0):t.value;
+if(t.type=="checkbox"||(d.s=="d"&&d.k=="d")){if(d.s=="d")sortD();save();render();return}
+save();tot()});
+document.addEventListener("keydown",function(e){if(e.key=="Enter"&&e.target.closest&&e.target.closest("#auth")){var b=document.querySelector("#auth [data-a=log],#auth [data-a=reg]");if(b)b.click()}});
+
+var ses;try{ses=sessionStorage.getItem("sess");var rem=false;if(!ses){ses=localStorage.getItem("sess");rem=!!ses}}catch(e){}
+if(ses&&(ses=="owner"||acc()[ses]))start(ses,rem);else gate();
+</script>
+</body>
+</html>
